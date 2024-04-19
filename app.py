@@ -95,8 +95,6 @@ class InitialScreen:
     def enter_screenshot_mode(self):
         self.master.withdraw()  # Close the initial screen window
         time.sleep(0.25)
-        if self.app:
-            self.app.unbind()
         self.screenshot_window = tk.Toplevel()  # Create a new window for screenshot mode
         self.app = ScreenshotApp(self.screenshot_window, self.master, export_dir=self.export_directory)
 
@@ -191,6 +189,7 @@ class ScreenshotApp:
         sys.exit(self.overlay_app.exec_())
 
     def end(self):
+        self.unbind()
         self.window.close()
         self.overlay_app.quit()
 
