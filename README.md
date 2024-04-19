@@ -2,6 +2,8 @@
 
 Swift Capture! is a screenshot tool designed to capture regions of your screen quickly and efficiently. With its intuitive interface and easy-to-use features, Swift Capture! makes capturing screenshots a breeze.
 
+<img src="https://github.com/dannythedev/swift_capture/assets/99733108/d37784ec-6cad-44e4-bdcb-8954047f9293" alt="image" width="30%">
+
 ## Features
 
 - **Select Screenshot Mode:** Press a button to enter screenshot mode and start capturing your screen.
