@@ -56,7 +56,7 @@ class InitialScreen:
     def __init__(self, master):
         self.master = master
         self.master.title("Swift Capture!")
-        self.master.geometry("300x150+100+100")  # Add padding
+        self.master.geometry("330x150+100+100")  # Add padding
         self.master.configure(bg=BG_COLOR)
         self.master.resizable(False, False)  # Make the window un-resizable
 
@@ -105,6 +105,7 @@ class InitialScreen:
 class ScreenshotApp:
     def __init__(self, master, top_master, export_dir):
 
+        self.export_directory = None
         self.export_dir = export_dir if export_dir else os.getcwd()
         self.master = master
         self.top_master = top_master
@@ -141,6 +142,16 @@ class ScreenshotApp:
 
         # Register the 's' key press event globally
         keyboard.on_press_key("s", self.capture_screenshot)
+        keyboard.on_press_key("esc", self.return_to_initial_screen)
+
+    def return_to_initial_screen(self, event=None):
+        self.unbind()
+        if self.thread and self.thread.is_alive():
+            self.thread.join()
+        if self.overlay_app:
+            self.overlay_app.quit()
+        self.top_master.deiconify()
+        self.master.destroy()
 
     def unbind(self):
         # Unbind all key bindings from the canvas
@@ -148,7 +159,7 @@ class ScreenshotApp:
         self.canvas.unbind_all("<B1-Motion>")
         self.canvas.unbind_all("<ButtonRelease-1>")
         # Unhook the 's' key
-        keyboard.unhook_key("s")
+        keyboard.unhook_all()
 
     @staticmethod
     def adjust_brightness(image, brightness_factor):
@@ -180,6 +191,7 @@ class ScreenshotApp:
             self.thread = Thread(target=self.start, args=(x1, y1, x2 - x1, y2 - y1,))
             self.thread.start()
         else:
+            self.canvas.delete(self.rect)  # Delete the drawn rectangle
             self.coordinates = None
 
     def start(self, x, y, w, h):
@@ -234,14 +246,16 @@ class ScreenshotApp:
         self.top_master.deiconify()
         self.master.destroy()
 
+    def find_first_non_consecutive(self):
+        files = os.listdir(self.export_directory)
+        files = [file.rstrip(".png") for file in files if file.endswith('.png')]
+        numbers = sorted(set(int(num) for num in files if num.isdigit()))
+        return next((num for num in range(1, len(numbers) + 2) if num not in numbers), None)
+
     def capture_screenshot(self, event):
         if self.coordinates:
             # Count existing screenshots in the folder
-            existing_screenshots = [filename for filename in os.listdir() if filename.startswith("screenshot")]
-            screenshot_count = len(existing_screenshots)
-
-            new_filename = f"screenshot_{str(screenshot_count + 1)}.png"
-
+            new_filename = f"{self.find_first_non_consecutive()}.png"
             x1, y1, x2, y2 = self.coordinates
             screenshot = pyautogui.screenshot(region=(x1, y1, x2 - x1, y2 - y1))
             screenshot.save(f"{self.export_dir}\\{new_filename}")  # Save screenshot to the selected directory
