@@ -247,7 +247,7 @@ class ScreenshotApp:
         self.master.destroy()
 
     def find_first_non_consecutive(self):
-        files = os.listdir(self.export_directory)
+        files = os.listdir(self.export_dir)
         files = [file.rstrip(".png") for file in files if file.endswith('.png')]
         numbers = sorted(set(int(num) for num in files if num.isdigit()))
         return next((num for num in range(1, len(numbers) + 2) if num not in numbers), None)
